@@ -2,6 +2,8 @@
 
 Ferramenta elegante para organizar downloads de áudio e vídeo do YouTube.
 
+![Screenshot](assets/Screenshot.png)
+
 ## Recursos
 - Download em MP3 ou MP4
 - Seleção de pasta de destino
