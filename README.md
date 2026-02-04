@@ -30,7 +30,7 @@ pyinstaller -y Rizzer_music_downloader.spec
 
 ## Criar instalador (Inno Setup)
 ```powershell
-& "C:\Users\matheus\AppData\Local\Programs\Inno Setup 6\ISCC.exe" "installer\Rizzer_music_downloader.iss"
+& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "installer\Rizzer_music_downloader.iss"
 ```
 
 O instalador gerado fica em `dist\RizzerMusicDownloadSetup.exe`.
