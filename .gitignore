@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.tmp
+.env
+.venv/
+venv/
+
+build/
+dist/
+ffmpeg/
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
