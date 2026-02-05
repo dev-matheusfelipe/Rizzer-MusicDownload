@@ -13,7 +13,7 @@ from yt_dlp import YoutubeDL
 # METADADOS DO APP
 # =========================
 APP_NAME = "Rizzer Music Download"
-APP_VERSION = "Versão: 1.1"
+APP_VERSION = "Versão: 1.2"
 APP_AUTHOR = "Rizzer Studio"
 APP_ICON = "Rizzer_MusicDownload.ico"
 APP_LOGO = "Rizzer_MusicDownload.png"
@@ -33,12 +33,9 @@ def get_documents_folder():
         return os.path.join(os.path.expanduser("~"), "Documents")
 
 
-DOCUMENTS_DIR = get_documents_folder()
-
 DEFAULT_DESTINO = os.path.join(
-    DOCUMENTS_DIR,
-    "Euro Truck Simulator 2",
-    "music"
+    os.path.expanduser("~"),
+    "Downloads"
 )
 
 os.makedirs(DEFAULT_DESTINO, exist_ok=True)
@@ -48,17 +45,20 @@ os.makedirs(DEFAULT_DESTINO, exist_ok=True)
 # =========================
 if getattr(sys, "frozen", False):
     BASE_DIR = sys._MEIPASS
-    PROJECT_DIR = BASE_DIR
+    INSTALL_DIR = os.path.dirname(sys.executable)
+    PROJECT_DIR = INSTALL_DIR
     ASSETS_DIR = os.path.join(BASE_DIR, "assets")
 else:
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     PROJECT_DIR = os.path.abspath(os.path.join(BASE_DIR, ".."))
+    INSTALL_DIR = PROJECT_DIR
     ASSETS_DIR = os.path.join(PROJECT_DIR, "assets")
 
 # =========================
 # FFMPEG (PORTABLE)
 # =========================
 FFMPEG_DIR = os.path.join(PROJECT_DIR, "ffmpeg", "bin")
+FFMPEG_DIR_FALLBACK = os.path.join(BASE_DIR, "ffmpeg", "bin")
 
 # =========================
 # UI CONFIG
@@ -94,10 +94,13 @@ def baixar():
         status_label.configure(text="Erro: informe a pasta de destino", text_color="red")
         return
 
-    if not os.path.exists(os.path.join(FFMPEG_DIR, "ffmpeg.exe")):
+    ffmpeg_bin = FFMPEG_DIR
+    if not os.path.exists(os.path.join(ffmpeg_bin, "ffmpeg.exe")):
+        ffmpeg_bin = FFMPEG_DIR_FALLBACK
+    if not os.path.exists(os.path.join(ffmpeg_bin, "ffmpeg.exe")):
         messagebox.showerror(
             "FFmpeg não encontrado",
-            f"FFmpeg não localizado em:\n\n{FFMPEG_DIR}"
+            f"FFmpeg não localizado em:\n\n{FFMPEG_DIR}\n{FFMPEG_DIR_FALLBACK}"
         )
         return
 
@@ -108,11 +111,26 @@ def baixar():
 
     def task():
         try:
+            common_opts = {
+                "http_headers": {
+                    "User-Agent": (
+                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                        "AppleWebKit/537.36 (KHTML, like Gecko) "
+                        "Chrome/120.0.0.0 Safari/537.36"
+                    ),
+                    "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8",
+                },
+                "extractor_args": {
+                    "youtube": {
+                        "player_client": ["android"],
+                    }
+                },
+            }
             if formato == "MP3 (Música)":
                 ydl_opts = {
                     "format": "bestaudio/best",
                     "outtmpl": os.path.join(destino, "%(title)s.%(ext)s"),
-                    "ffmpeg_location": FFMPEG_DIR,
+                    "ffmpeg_location": ffmpeg_bin,
                     "postprocessors": [{
                         "key": "FFmpegExtractAudio",
                         "preferredcodec": "mp3",
@@ -125,9 +143,10 @@ def baixar():
                     "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]",
                     "outtmpl": os.path.join(destino, "%(title)s.%(ext)s"),
                     "merge_output_format": "mp4",
-                    "ffmpeg_location": FFMPEG_DIR,
+                    "ffmpeg_location": ffmpeg_bin,
                     "quiet": True,
                 }
+            ydl_opts.update(common_opts)
 
             with YoutubeDL(ydl_opts) as ydl:
                 ydl.download([url])
@@ -407,3 +426,6 @@ version_badge = ctk.CTkLabel(
 version_badge.pack(side="left", padx=(6, 0))
 
 app.mainloop()
+
+
+

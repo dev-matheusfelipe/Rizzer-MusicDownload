@@ -1,6 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-
 a = Analysis(
     ['src\\Rizzer_music_downloader.py'],
     pathex=[],
@@ -8,6 +7,9 @@ a = Analysis(
     datas=[
         ('assets\\Rizzer_MusicDownload.png', 'assets'),
         ('assets\\Rizzer_MusicDownload.ico', 'assets'),
+        ('ffmpeg\\bin\\ffmpeg.exe', 'ffmpeg\\bin'),
+        ('ffmpeg\\bin\\ffprobe.exe', 'ffmpeg\\bin'),
+        ('ffmpeg\\bin\\ffplay.exe', 'ffmpeg\\bin'),
     ],
     hiddenimports=[],
     hookspath=[],
