@@ -1,7 +1,7 @@
 [Setup]
 AppId={{7A9F45D8-5F2B-4D83-9D70-1C3C9E6B0D1F}
 AppName=Rizzer Music Download
-AppVersion=1.2
+AppVersion=1.2.1
 AppPublisher=Rizzer Studio
 DefaultDirName={autopf}\Rizzer Music Download
 DefaultGroupName=Rizzer Music Download

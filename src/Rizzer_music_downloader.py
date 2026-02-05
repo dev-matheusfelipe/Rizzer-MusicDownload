@@ -13,7 +13,7 @@ from yt_dlp import YoutubeDL
 # METADADOS DO APP
 # =========================
 APP_NAME = "Rizzer Music Download"
-APP_VERSION = "Versão: 1.2"
+APP_VERSION = "Versão: 1.2.1"
 APP_AUTHOR = "Rizzer Studio"
 APP_ICON = "Rizzer_MusicDownload.ico"
 APP_LOGO = "Rizzer_MusicDownload.png"
@@ -81,6 +81,7 @@ WARNING = "#FBBF24"
 # =========================
 # DOWNLOAD
 # =========================
+stop_event = threading.Event()
 def baixar():
     url = entry_url.get().strip()
     destino = entry_destino.get().strip()
@@ -125,7 +126,12 @@ def baixar():
                         "player_client": ["android"],
                     }
                 },
+                "noplaylist": True,
+                "playlist_items": "1",
             }
+            def on_progress(d):
+                if stop_event.is_set():
+                    raise Exception("Download cancelado pelo usuÃ¡rio.")
             if formato == "MP3 (Música)":
                 ydl_opts = {
                     "format": "bestaudio/best",
@@ -137,6 +143,7 @@ def baixar():
                         "preferredquality": "192",
                     }],
                     "quiet": True,
+                    "progress_hooks": [on_progress],
                 }
             else:
                 ydl_opts = {
@@ -145,6 +152,7 @@ def baixar():
                     "merge_output_format": "mp4",
                     "ffmpeg_location": ffmpeg_bin,
                     "quiet": True,
+                    "progress_hooks": [on_progress],
                 }
             ydl_opts.update(common_opts)
 
@@ -163,7 +171,7 @@ def baixar():
         finally:
             btn_start.configure(state="normal")
 
-    threading.Thread(target=task).start()
+    threading.Thread(target=task, daemon=True).start()
 
 
 def escolher_pasta():
@@ -425,7 +433,13 @@ version_badge = ctk.CTkLabel(
 )
 version_badge.pack(side="left", padx=(6, 0))
 
+def on_close():
+    stop_event.set()
+    app.destroy()
+
+app.protocol("WM_DELETE_WINDOW", on_close)
 app.mainloop()
+
 
 
 
